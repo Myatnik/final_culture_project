@@ -1,0 +1,14 @@
+sequenceDiagram
+    actor Admin as Administrator
+    participant UI as Application UI
+    participant Service as services.py
+    participant DB as SQLite Database
+    
+    Admin->>UI: select stay and register guest
+    UI->>Service: send data to service
+    Service->>DB: SELECT guest_id, room_id, total_price
+    DB-->>Service: stay data
+    Service->>DB: DELETE FROM stays
+    DB-->>Service: commit successful
+    Service-->>UI: success
+    UI-->>Admin: show saved revenue
