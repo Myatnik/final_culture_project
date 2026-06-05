@@ -1,0 +1,14 @@
+flowchart LR
+    Guest[Guest]
+    Hostes[Hostes]
+    Admin[Administrator]
+    
+    HMS[Hotel Management System]
+    Core[Reusable Core Component]
+    DB[(SQLite Database)]
+    
+    Guest --> HMS
+    Admin --> HMS
+    Hostes --> HMS
+    HMS --> Core
+    HMS --> DB

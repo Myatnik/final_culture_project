@@ -1,0 +1,19 @@
+flowchart TD
+    subgraph "Hotel Management System"
+        UC1["(Register guest)"]
+        UC2["(View dashboard)"]
+        UC3["(Assign cleaning)"]
+        UC4["(Assign maintenance)"]
+        UC5["(Complete task)"]
+        UC6["(Check out guest)"]
+        UC7["(Search guest history)"]
+    end
+    
+    Hostes --> UC1
+    Hostes --> UC2
+    Hostes --> UC3
+    Hostes --> UC4
+    Hostes --> UC5
+    Hostes --> UC6
+    Hostes --> UC7
+    Guest --> UC1
