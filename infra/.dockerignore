@@ -1,0 +1,14 @@
+.git
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+htmlcov
+.coverage
+hotel.db
+test_hotel.db
+docs/_generated
+.env
+.DS_Store
+.vscode
+.idea

@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: hotel-app:local
+    container_name: hotel_app
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - db_data:/app/data
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    working_dir: /app
+
+volumes:
+  db_data:
