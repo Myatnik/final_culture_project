@@ -11,16 +11,8 @@ def get_next_room_status(current_status):
     return status_flow.get(current_status, 'available')
 
 def calculate_stay_price(base_price, nights, services):
-    """Calculate total price for stay.
-
-    Args:
-        base_price: Room price per night
-        nights: Number of nights
-        services: List of dicts with 'price' key
-
-    Returns:
-        Total price
-    """
+    if nights <= 0:
+        raise ValueError("Number of nights must be positive")
     room_total = base_price * nights
     services_total = sum(svc['price'] * nights for svc in services)
     return room_total + services_total
@@ -56,7 +48,10 @@ def get_services():
     return services
 
 def register_guest(first_name, last_name, phone, email):
-    """Register new guest in database."""
+    if not first_name or not first_name.strip():
+        raise ValueError("first_name cannot be empty")
+    if not last_name or not last_name.strip():
+        raise ValueError("last_name cannot be empty")
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
