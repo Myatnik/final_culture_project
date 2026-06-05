@@ -1,0 +1,27 @@
+[
+    {
+        "service_id": 1,
+        "service_name": "Breakfast",
+        "price": 800.00
+    },
+    {
+        "service_id": 2,
+        "service_name": "SPA",
+        "price": 3500.00
+    },
+    {
+        "service_id": 3,
+        "service_name": "Transfer",
+        "price": 2500.00
+    },
+    {
+        "service_id": 4,
+        "service_name": "Mini-bar",
+        "price": 1200.00
+    },
+    {
+        "service_id": 5,
+        "service_name": "Laundry",
+        "price": 500.00
+    }
+]

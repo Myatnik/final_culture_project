@@ -1,0 +1,22 @@
+[
+    {
+        "category_id": 1,
+        "category_name": "Standard",
+        "base_price": 3500.00
+    },
+    {
+        "category_id": 2,
+        "category_name": "Comfort",
+        "base_price": 5000.00
+    },
+    {
+        "category_id": 3,
+        "category_name": "Luxury",
+        "base_price": 8500.00
+    },
+    {
+        "category_id": 4,
+        "category_name": "Economy",
+        "base_price": 2500.00
+    }
+]

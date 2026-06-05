@@ -1,0 +1,20 @@
+[
+    {
+        "stay_id": 1,
+        "guest_id": 2,
+        "room_id": 1,
+        "check_in_date": "2026-05-10",
+        "check_out_date": "2026-05-15",
+        "total_price": 17500.00,
+        "payment_status": "paid"
+    },
+    {
+        "stay_id": 2,
+        "guest_id": 3,
+        "room_id": 7,
+        "check_in_date": "2026-05-12",
+        "check_out_date": "2026-05-14",
+        "total_price": 5000.00,
+        "payment_status": "paid"
+    }
+]

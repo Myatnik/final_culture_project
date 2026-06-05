@@ -1,0 +1,26 @@
+[
+    {
+        "guest_id": 1,
+        "first_name": "Ivan",
+        "last_name": "Petrov",
+        "phone": "+79161234567",
+        "email": "ivan.petrov@example.com",
+        "total_spent": 0.0
+    },
+    {
+        "guest_id": 2,
+        "first_name": "Maria",
+        "last_name": "Sidorova",
+        "phone": "+79169876543",
+        "email": "maria@example.com",
+        "total_spent": 17500.00
+    },
+    {
+        "guest_id": 3,
+        "first_name": "Alexey",
+        "last_name": "Ivanov",
+        "phone": "+79031234567",
+        "email": "alexey.i@example.com",
+        "total_spent": 5000.00
+    }
+]
