@@ -8,6 +8,7 @@ author = 'Vitaliy Vyborov, Shvetsov Maksim'
 
 # Extensions
 extensions = [
+    "sphinxcontrib.mermaid",
     'myst_parser',
 ]
 
@@ -31,3 +32,6 @@ html_static_path = ['_static']
 
 # Templates
 templates_path = ['_templates']
+
+# For mermaid diagrams
+myst_fence_as_directive = ["mermaid"]
