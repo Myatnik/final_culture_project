@@ -91,19 +91,13 @@ def init_db():
             ('101', 1, 1, 'available'),
             ('102', 1, 1, 'available'),
             ('201', 2, 2, 'available'),
-            ('202', 2, 2, 'cleaning'),
+            ('202', 2, 2, 'available'),
             ('301', 3, 3, 'available'),
-            ('302', 3, 3, 'maintenance'),
+            ('302', 3, 3, 'available'),
             ('401', 4, 4, 'available'),
             ('105', 4, 1, 'available')
         ]
         cursor.executemany("INSERT INTO rooms (room_number, category_id, floor, status) VALUES (?, ?, ?, ?)", rooms)
-
-        guests = [
-            ('Ivan', 'Petrov', '+79161234567', 'ivan.petrov@mail.ru', 0.0),
-            ('Maria', 'Sidorova', '+79262345678', 'maria.s@gmail.com', 0.0)
-        ]
-        cursor.executemany("INSERT INTO guests (first_name, last_name, phone, email, total_spent) VALUES (?, ?, ?, ?, ?)", guests)
 
         staff = [
             ('Olga', 'Volkova', 'administrator', '+79161112233', '2023-03-15'),
@@ -122,9 +116,6 @@ def init_db():
             ('Laundry', 500.00)
         ]
         cursor.executemany("INSERT INTO services (service_name, price) VALUES (?, ?)", services)
-
-        cursor.execute("INSERT INTO stays (guest_id, room_id, check_in_date, check_out_date, stay_status, total_price, payment_status) VALUES (1, 1, '2026-05-20', '2026-05-25', 'active', 17500.00, 'paid')")
-        cursor.execute("UPDATE rooms SET status='occupied' WHERE room_id=1")
 
     conn.commit()
     conn.close()
