@@ -1,4 +1,3 @@
-# -*- coding: cp1251 -*- #
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import sqlite3
@@ -178,7 +177,7 @@ class App(tk.Tk):
         self.clear_content()
         title = tk.Label(self.content_frame, text="Панель управления", font=("Arial", 18, "bold"), bg="white", fg="#2c3e50")
         title.pack(pady=10, anchor="w", padx=20)
-        
+
         stats_frame = tk.Frame(self.content_frame, bg="white")
         stats_frame.pack(fill="x", padx=20)
         conn = get_connection()
@@ -188,14 +187,14 @@ class App(tk.Tk):
         cur.execute("SELECT COUNT(*) FROM rooms WHERE status = 'занят'")
         occupied = cur.fetchone()[0]
         available = total_rooms - occupied
-        
+
         cur.execute("SELECT COALESCE(SUM(total_price), 0) FROM stays WHERE payment_status='оплачено'")
         active_rev = cur.fetchone()[0]
         cur.execute("SELECT COALESCE(SUM(total_spent), 0) FROM guests")
         history_rev = cur.fetchone()[0]
         revenue = active_rev + history_rev
         conn.close()
-        
+
         self.create_stat_card(stats_frame, "Всего номеров", str(total_rooms), "#3498db", 0)
         self.create_stat_card(stats_frame, "Занято", str(occupied), "#e74c3c", 1)
         self.create_stat_card(stats_frame, "Свободно", str(available), "#2ecc71", 2)
@@ -257,13 +256,13 @@ class App(tk.Tk):
         cur = conn.cursor()
         cur.execute("SELECT status FROM rooms WHERE room_id=?", (room_id,))
         current_status = cur.fetchone()['status']
-        
+
         if current_status == 'занят':
             messagebox.showinfo("Внимание", "Нельзя менять статус занятого номера. Сначала выселите гостя.")
             conn.close()
             self.show_dashboard()
             return
-            
+
         next_status = {'свободен': 'уборка', 'уборка': 'ремонт', 'ремонт': 'свободен'}.get(current_status, 'свободен')
         cur.execute("UPDATE rooms SET status=? WHERE room_id=?", (next_status, room_id))
         conn.commit()
@@ -300,8 +299,6 @@ class App(tk.Tk):
         cat_frame.grid(row=6, column=1, pady=5, sticky="w")
         self.combo_cat = ttk.Combobox(cat_frame, width=25, state="readonly")
         self.combo_cat.pack(side="left")
-        btn_edit_cat = tk.Button(cat_frame, text="Изм. название", command=self.edit_category_name, bg="#f39c12", fg="white")
-        btn_edit_cat.pack(side="left", padx=5)
         self.refresh_categories()
         tk.Label(form_frame, text="Доп. услуги:", bg="white").grid(row=7, column=0, sticky="nw", pady=5)
         self.services_frame = tk.Frame(form_frame, bg="white")
@@ -364,7 +361,7 @@ class App(tk.Tk):
         selected_cat = self.current_categories[cat_idx]
         cat_id = selected_cat['category_id']
         base_price = selected_cat['base_price']
-        
+
         conn = get_connection()
         cur = conn.cursor()
         cur.execute("SELECT room_id FROM rooms WHERE category_id=? AND status='свободен' LIMIT 1", (cat_id,))
@@ -408,22 +405,6 @@ class App(tk.Tk):
         names = [c['category_name'] for c in self.current_categories]
         self.combo_cat['values'] = names
         if names: self.combo_cat.current(0)
-
-    def edit_category_name(self):
-        idx = self.combo_cat.current()
-        if idx < 0: return
-        old_name = self.current_categories[idx]['category_name']
-        cat_id = self.current_categories[idx]['category_id']
-        new_name = simpledialog.askstring("Редактирование категории", f"Введите новое название для '{old_name}':", initialvalue=old_name)
-        if new_name and new_name != old_name:
-            conn = get_connection()
-            cur = conn.cursor()
-            cur.execute("UPDATE room_categories SET category_name = ? WHERE category_id = ?", (new_name, cat_id))
-            conn.commit()
-            conn.close()
-            self.refresh_categories()
-            self.combo_cat.current(idx)
-            self.update_total()
 
     def show_cleaning(self):
         self.clear_content()
