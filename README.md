@@ -217,3 +217,6 @@ make compose-down
 ## Лицензия
 
 Проект создан в учебных целях.
+
+<h1 align="center"> Change the world. My final commit. Goodbye. </h1>
+<h1 align="center"> 🕯️ </h1>
