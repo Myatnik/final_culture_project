@@ -212,6 +212,7 @@ make compose-down
 - pytest-cov >= 5.0.0
 - sphinx >= 7.0.0
 - myst-parser >= 2.0.0
+- sphinxcontrib-mermaid >= 0.9.2
 
 ## Лицензия
 
