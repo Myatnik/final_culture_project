@@ -386,9 +386,13 @@ def test_guest_registration_flow():
     conn = test_db.get_connection()
     cursor = conn.cursor()
     
+    # Save initial counts
     cursor.execute("SELECT COUNT(*) FROM rooms WHERE status='available'")
     available_before = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM rooms WHERE status='occupied'")
+    occupied_before = cursor.fetchone()[0]
     
+    # Simulate guest registration
     cursor.execute("""
         INSERT INTO guests (first_name, last_name, phone, email) 
         VALUES (?, ?, ?, ?)
@@ -410,6 +414,9 @@ def test_guest_registration_flow():
     
     cursor.execute("UPDATE rooms SET status='occupied' WHERE room_id=?", (room_id,))
     
+    # Verify changes
+    cursor.execute("SELECT COUNT(*) FROM rooms WHERE status='available'")
+    available_after = cursor.fetchone()[0]
     cursor.execute("SELECT COUNT(*) FROM rooms WHERE status='occupied'")
     occupied_after = cursor.fetchone()[0]
     
@@ -422,7 +429,9 @@ def test_guest_registration_flow():
     conn.commit()
     conn.close()
     
-    assert available_before == occupied_after, "Room status not updated correctly"
+    # Correct assertions
+    assert available_after == available_before - 1, f"Available rooms: expected {available_before - 1}, got {available_after}"
+    assert occupied_after == occupied_before + 1, f"Occupied rooms: expected {occupied_before + 1}, got {occupied_after}"
     assert guest_count == 1, "Guest was not inserted"
     assert stay_count == 1, "Stay record was not created"
     
