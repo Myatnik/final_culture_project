@@ -1,6 +1,6 @@
 import sqlite3
-
-DB_NAME = "hotel.db"
+import os
+DB_NAME = os.environ.get("HOTEL_DB_PATH", "hotel.db")
 
 def get_connection():
     """Create database connection with foreign keys support."""

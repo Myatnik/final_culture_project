@@ -25,3 +25,21 @@
 sudo apt update
 sudo apt install python3-tk
 ```
+
+## Запуск через Docker (Linux)
+
+Перед первым запуском выполните:
+
+```bash
+
+xhost +local:docker
+```
+
+### Требования для Docker с GUI (Linux)
+
+Если команда `xhost` не найдена, установите:
+
+```bash
+
+sudo apt install x11-xserver-utils
+```

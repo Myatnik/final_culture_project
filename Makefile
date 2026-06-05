@@ -1,6 +1,6 @@
 COVERAGE_CMD ?= .venv/bin/pytest tests/ --cov=. --cov-report=html
 
-.PHONY: help install run test clean rm_db coverage setup check
+.PHONY: help install run test clean rm_db coverage setup check compose-up compose-down
 
 help:
 	@echo "Available commands:"
@@ -12,6 +12,8 @@ help:
 	@echo " make coverage - Find test coverage "
 	@echo " make setup - Prepare project for running "
 	@echo " make check - Check everything in project "
+	@echo " make compose-up - Build and start docker container"
+	@echo " make compose-down - Stop and clean docker container"
 install:
 	python3 -m venv .venv
 	.venv/bin/pip install -r requirements-dev.txt
@@ -27,3 +29,7 @@ coverage:
 	$(COVERAGE_CMD)
 setup: install
 check: test coverage
+compose-up:
+	docker compose -f infra/compose.yaml up --build
+compose-down:
+	docker compose -f infra/compose.yaml down -v
