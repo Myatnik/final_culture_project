@@ -20,7 +20,7 @@ run:
 test:
 	.venv/bin/pytest tests/ -v
 clean:
-	rm -rf __pycache__ *.pyc .pytest_cache
+	rm -rf __pycache__ *.pyc .pytest_cache .coverage htmlcov
 rm_db:
 	rm -f hotel.db
 coverage:
