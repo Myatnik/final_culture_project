@@ -1,4 +1,3 @@
-# -*- coding: cp1251 -*- #
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import sqlite3
@@ -28,7 +27,7 @@ def init_db():
             room_number TEXT NOT NULL UNIQUE,
             category_id INTEGER REFERENCES room_categories(category_id),
             floor INTEGER NOT NULL,
-            status TEXT DEFAULT 'свободен'
+            status TEXT DEFAULT 'available'
         );
 
         CREATE TABLE IF NOT EXISTS guests (
@@ -47,9 +46,9 @@ def init_db():
             room_id INTEGER REFERENCES rooms(room_id),
             check_in_date DATE NOT NULL,
             check_out_date DATE NOT NULL,
-            stay_status TEXT DEFAULT 'активно',
+            stay_status TEXT DEFAULT 'active',
             total_price REAL,
-            payment_status TEXT DEFAULT 'оплачено',
+            payment_status TEXT DEFAULT 'paid',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -74,58 +73,58 @@ def init_db():
             staff_id INTEGER REFERENCES staff(staff_id),
             task_type TEXT NOT NULL,
             task_date DATE DEFAULT (DATE('now')),
-            status TEXT DEFAULT 'ожидает'
+            status TEXT DEFAULT 'pending'
         );
     """)
 
     cursor.execute("SELECT COUNT(*) FROM room_categories")
     if cursor.fetchone()[0] == 0:
         categories = [
-            ('Стандарт', 3500.00),
-            ('Комфорт', 5000.00),
-            ('Люкс', 8500.00),
-            ('Эконом', 2500.00)
+            ('Standard', 3500.00),
+            ('Comfort', 5000.00),
+            ('Luxury', 8500.00),
+            ('Economy', 2500.00)
         ]
         cursor.executemany("INSERT INTO room_categories (category_name, base_price) VALUES (?, ?)", categories)
 
         rooms = [
-            ('101', 1, 1, 'свободен'),
-            ('102', 1, 1, 'свободен'),
-            ('201', 2, 2, 'свободен'),
-            ('202', 2, 2, 'уборка'),
-            ('301', 3, 3, 'свободен'),
-            ('302', 3, 3, 'ремонт'),
-            ('401', 4, 4, 'свободен'),
-            ('105', 4, 1, 'свободен')
+            ('101', 1, 1, 'available'),
+            ('102', 1, 1, 'available'),
+            ('201', 2, 2, 'available'),
+            ('202', 2, 2, 'cleaning'),
+            ('301', 3, 3, 'available'),
+            ('302', 3, 3, 'maintenance'),
+            ('401', 4, 4, 'available'),
+            ('105', 4, 1, 'available')
         ]
         cursor.executemany("INSERT INTO rooms (room_number, category_id, floor, status) VALUES (?, ?, ?, ?)", rooms)
 
         guests = [
-            ('Иван', 'Петров', '+79161234567', 'ivan.petrov@mail.ru', 0.0),
-            ('Мария', 'Сидорова', '+79262345678', 'maria.s@gmail.com', 0.0)
+            ('Ivan', 'Petrov', '+79161234567', 'ivan.petrov@mail.ru', 0.0),
+            ('Maria', 'Sidorova', '+79262345678', 'maria.s@gmail.com', 0.0)
         ]
         cursor.executemany("INSERT INTO guests (first_name, last_name, phone, email, total_spent) VALUES (?, ?, ?, ?, ?)", guests)
 
         staff = [
-            ('Ольга', 'Волкова', 'администратор', '+79161112233', '2023-03-15'),
-            ('Наталья', 'Помидорова', 'уборщик', '+79033334455', '2024-01-10'),
-            ('Сергей', 'Морозов', 'уборщик', '+79154445566', '2025-02-20'),
-            ('Николай', 'Яковлев', 'ремонтник', '+79031112233', '2024-06-15'),
-            ('Анна', 'Соколова', 'администратор', '+79265556677', '2024-08-01')
+            ('Olga', 'Volkova', 'administrator', '+79161112233', '2023-03-15'),
+            ('Natalia', 'Pomidorova', 'cleaner', '+79033334455', '2024-01-10'),
+            ('Sergey', 'Morozov', 'cleaner', '+79154445566', '2025-02-20'),
+            ('Nikolay', 'Yakovlev', 'maintenance_worker', '+79031112233', '2024-06-15'),
+            ('Anna', 'Sokolova', 'administrator', '+79265556677', '2024-08-01')
         ]
         cursor.executemany("INSERT INTO staff (first_name, last_name, position, phone, hire_date) VALUES (?, ?, ?, ?, ?)", staff)
 
         services = [
-            ('Завтрак', 800.00),
-            ('СПА', 3500.00),
-            ('Трансфер', 2500.00),
-            ('Мини-бар', 1200.00),
-            ('Прачечная', 500.00)
+            ('Breakfast', 800.00),
+            ('SPA', 3500.00),
+            ('Transfer', 2500.00),
+            ('Mini-bar', 1200.00),
+            ('Laundry', 500.00)
         ]
         cursor.executemany("INSERT INTO services (service_name, price) VALUES (?, ?)", services)
 
-        cursor.execute("INSERT INTO stays (guest_id, room_id, check_in_date, check_out_date, stay_status, total_price, payment_status) VALUES (1, 1, '2026-05-20', '2026-05-25', 'активно', 17500.00, 'оплачено')")
-        cursor.execute("UPDATE rooms SET status='занят' WHERE room_id=1")
+        cursor.execute("INSERT INTO stays (guest_id, room_id, check_in_date, check_out_date, stay_status, total_price, payment_status) VALUES (1, 1, '2026-05-20', '2026-05-25', 'active', 17500.00, 'paid')")
+        cursor.execute("UPDATE rooms SET status='occupied' WHERE room_id=1")
 
     conn.commit()
     conn.close()
@@ -133,7 +132,7 @@ def init_db():
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Система управления отелем")
+        self.title("Hotel Management System")
         self.geometry("1120x720")
         self.resizable(False, False)
         self.configure(bg="#f0f0f0")
@@ -147,7 +146,7 @@ class App(tk.Tk):
         header_frame = tk.Frame(self, bg="#2c3e50", height=60)
         header_frame.pack(fill="x")
         header_frame.pack_propagate(False)
-        label = tk.Label(header_frame, text="СИСТЕМА УПРАВЛЕНИЯ ОТЕЛЕМ", font=("Arial", 20, "bold"), fg="white", bg="#2c3e50")
+        label = tk.Label(header_frame, text="HOTEL MANAGEMENT SYSTEM", font=("Arial", 20, "bold"), fg="white", bg="#2c3e50")
         label.pack(side="left", padx=20, pady=10)
 
     def create_navigation(self):
@@ -155,12 +154,12 @@ class App(tk.Tk):
         nav_frame.pack(side="left", fill="y")
         nav_frame.pack_propagate(False)
         buttons = [
-            ("Главная", self.show_dashboard),
-            ("Регистрация", self.show_registration),
-            ("Уборка", self.show_cleaning),
-            ("Ремонт", self.show_maintenance),
-            ("Проживания", self.show_stays),
-            ("Гости", self.show_guests),
+            ("Dashboard", self.show_dashboard),
+            ("Registration", self.show_registration),
+            ("Cleaning", self.show_cleaning),
+            ("Maintenance", self.show_maintenance),
+            ("Stays", self.show_stays),
+            ("Guests", self.show_guests),
         ]
         for text, command in buttons:
             btn = tk.Button(nav_frame, text=text, font=("Arial", 12), bg="#34495e", fg="white", activebackground="#465f75", activeforeground="white", bd=0, anchor="w", padx=20, pady=15, command=command)
@@ -176,38 +175,38 @@ class App(tk.Tk):
 
     def show_dashboard(self):
         self.clear_content()
-        title = tk.Label(self.content_frame, text="Панель управления", font=("Arial", 18, "bold"), bg="white", fg="#2c3e50")
+        title = tk.Label(self.content_frame, text="Dashboard", font=("Arial", 18, "bold"), bg="white", fg="#2c3e50")
         title.pack(pady=10, anchor="w", padx=20)
-        
+
         stats_frame = tk.Frame(self.content_frame, bg="white")
         stats_frame.pack(fill="x", padx=20)
         conn = get_connection()
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) FROM rooms")
         total_rooms = cur.fetchone()[0]
-        cur.execute("SELECT COUNT(*) FROM rooms WHERE status = 'занят'")
+        cur.execute("SELECT COUNT(*) FROM rooms WHERE status = 'occupied'")
         occupied = cur.fetchone()[0]
         available = total_rooms - occupied
-        
-        cur.execute("SELECT COALESCE(SUM(total_price), 0) FROM stays WHERE payment_status='оплачено'")
+
+        cur.execute("SELECT COALESCE(SUM(total_price), 0) FROM stays WHERE payment_status='paid'")
         active_rev = cur.fetchone()[0]
         cur.execute("SELECT COALESCE(SUM(total_spent), 0) FROM guests")
         history_rev = cur.fetchone()[0]
         revenue = active_rev + history_rev
         conn.close()
-        
-        self.create_stat_card(stats_frame, "Всего номеров", str(total_rooms), "#3498db", 0)
-        self.create_stat_card(stats_frame, "Занято", str(occupied), "#e74c3c", 1)
-        self.create_stat_card(stats_frame, "Свободно", str(available), "#2ecc71", 2)
-        self.create_stat_card(stats_frame, "Выручка", f"{revenue:,.2f} руб.", "#f1c40f", 3)
 
-        tk.Label(self.content_frame, text="Карта номеров", font=("Arial", 14, "bold"), bg="white").pack(pady=(15, 5), anchor="w", padx=20)
+        self.create_stat_card(stats_frame, "Total Rooms", str(total_rooms), "#3498db", 0)
+        self.create_stat_card(stats_frame, "Occupied", str(occupied), "#e74c3c", 1)
+        self.create_stat_card(stats_frame, "Available", str(available), "#2ecc71", 2)
+        self.create_stat_card(stats_frame, "Revenue", f"{revenue:,.2f} RUB", "#f1c40f", 3)
+
+        tk.Label(self.content_frame, text="Room Map", font=("Arial", 14, "bold"), bg="white").pack(pady=(15, 5), anchor="w", padx=20)
         legend_frame = tk.Frame(self.content_frame, bg="white")
         legend_frame.pack(anchor="w", padx=20, pady=5)
-        self.create_legend_dot(legend_frame, "Свободен", "#2ecc71")
-        self.create_legend_dot(legend_frame, "Занят", "#e74c3c")
-        self.create_legend_dot(legend_frame, "Уборка", "#f1c40f")
-        self.create_legend_dot(legend_frame, "Ремонт", "#e67e22")
+        self.create_legend_dot(legend_frame, "Available", "#2ecc71")
+        self.create_legend_dot(legend_frame, "Occupied", "#e74c3c")
+        self.create_legend_dot(legend_frame, "Cleaning", "#f1c40f")
+        self.create_legend_dot(legend_frame, "Maintenance", "#e67e22")
 
         grid_frame = tk.Frame(self.content_frame, bg="white")
         grid_frame.pack(fill="both", expand=True, padx=20, pady=10)
@@ -235,11 +234,11 @@ class App(tk.Tk):
             floors[fl].append(room)
         row_idx = 0
         for floor in sorted(floors.keys()):
-            tk.Label(parent_frame, text=f"Этаж {floor}", font=("Arial", 12, "bold"), bg="white").grid(row=row_idx, column=0, sticky="w", pady=5)
+            tk.Label(parent_frame, text=f"Floor {floor}", font=("Arial", 12, "bold"), bg="white").grid(row=row_idx, column=0, sticky="w", pady=5)
             row_idx += 1
             col_idx = 1
             for room in floors[floor]:
-                color_map = {'свободен': '#2ecc71', 'занят': '#e74c3c', 'уборка': '#f1c40f', 'ремонт': '#e67e22'}
+                color_map = {'available': '#2ecc71', 'occupied': '#e74c3c', 'cleaning': '#f1c40f', 'maintenance': '#e67e22'}
                 color = color_map.get(room['status'], '#95a5a6')
                 btn = tk.Button(parent_frame, text=f"{room['room_number']}\n{room['category_name']}", bg=color, fg="white", width=12, height=3, command=lambda r=room['room_id']: self.toggle_room_status(r))
                 btn.grid(row=row_idx, column=col_idx, padx=5, pady=5)
@@ -257,14 +256,14 @@ class App(tk.Tk):
         cur = conn.cursor()
         cur.execute("SELECT status FROM rooms WHERE room_id=?", (room_id,))
         current_status = cur.fetchone()['status']
-        
-        if current_status == 'занят':
-            messagebox.showinfo("Внимание", "Нельзя менять статус занятого номера. Сначала выселите гостя.")
+
+        if current_status == 'occupied':
+            messagebox.showinfo("Warning", "Cannot change status of an occupied room. Check out the guest first.")
             conn.close()
             self.show_dashboard()
             return
-            
-        next_status = {'свободен': 'уборка', 'уборка': 'ремонт', 'ремонт': 'свободен'}.get(current_status, 'свободен')
+
+        next_status = {'available': 'cleaning', 'cleaning': 'maintenance', 'maintenance': 'available'}.get(current_status, 'available')
         cur.execute("UPDATE rooms SET status=? WHERE room_id=?", (next_status, room_id))
         conn.commit()
         conn.close()
@@ -272,47 +271,45 @@ class App(tk.Tk):
 
     def show_registration(self):
         self.clear_content()
-        tk.Label(self.content_frame, text="Регистрация гостя", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
+        tk.Label(self.content_frame, text="Guest Registration", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
         form_frame = tk.Frame(self.content_frame, bg="white")
         form_frame.pack(fill="x", padx=20, pady=10)
-        tk.Label(form_frame, text="Фамилия:", bg="white").grid(row=0, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Last Name:", bg="white").grid(row=0, column=0, sticky="w", pady=5)
         self.ent_lastname = tk.Entry(form_frame, width=30)
         self.ent_lastname.grid(row=0, column=1, pady=5)
-        tk.Label(form_frame, text="Имя:", bg="white").grid(row=1, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="First Name:", bg="white").grid(row=1, column=0, sticky="w", pady=5)
         self.ent_firstname = tk.Entry(form_frame, width=30)
         self.ent_firstname.grid(row=1, column=1, pady=5)
-        tk.Label(form_frame, text="Телефон:", bg="white").grid(row=2, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Phone:", bg="white").grid(row=2, column=0, sticky="w", pady=5)
         self.ent_phone = tk.Entry(form_frame, width=30)
         self.ent_phone.grid(row=2, column=1, pady=5)
         tk.Label(form_frame, text="Email:", bg="white").grid(row=3, column=0, sticky="w", pady=5)
         self.ent_email = tk.Entry(form_frame, width=30)
         self.ent_email.grid(row=3, column=1, pady=5)
-        tk.Label(form_frame, text="Дата заезда:", bg="white").grid(row=4, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Check-in Date:", bg="white").grid(row=4, column=0, sticky="w", pady=5)
         self.ent_checkin = tk.Entry(form_frame, width=30)
         self.ent_checkin.insert(0, datetime.now().strftime("%Y-%m-%d"))
         self.ent_checkin.grid(row=4, column=1, pady=5)
-        tk.Label(form_frame, text="Кол-во ночей:", bg="white").grid(row=5, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Number of Nights:", bg="white").grid(row=5, column=0, sticky="w", pady=5)
         self.ent_nights = tk.Entry(form_frame, width=30)
         self.ent_nights.insert(0, "1")
         self.ent_nights.grid(row=5, column=1, pady=5)
-        tk.Label(form_frame, text="Категория:", bg="white").grid(row=6, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Category:", bg="white").grid(row=6, column=0, sticky="w", pady=5)
         cat_frame = tk.Frame(form_frame, bg="white")
         cat_frame.grid(row=6, column=1, pady=5, sticky="w")
         self.combo_cat = ttk.Combobox(cat_frame, width=25, state="readonly")
         self.combo_cat.pack(side="left")
-        btn_edit_cat = tk.Button(cat_frame, text="Изм. название", command=self.edit_category_name, bg="#f39c12", fg="white")
-        btn_edit_cat.pack(side="left", padx=5)
         self.refresh_categories()
-        tk.Label(form_frame, text="Доп. услуги:", bg="white").grid(row=7, column=0, sticky="nw", pady=5)
+        tk.Label(form_frame, text="Additional Services:", bg="white").grid(row=7, column=0, sticky="nw", pady=5)
         self.services_frame = tk.Frame(form_frame, bg="white")
         self.services_frame.grid(row=7, column=1, pady=5, sticky="w")
         self.service_vars = []
         self.load_services_checkboxes()
-        self.lbl_total = tk.Label(form_frame, text="Итого: 0.00 руб.", font=("Arial", 14, "bold"), bg="white", fg="#2c3e50")
+        self.lbl_total = tk.Label(form_frame, text="Total: 0.00 RUB", font=("Arial", 14, "bold"), bg="white", fg="#2c3e50")
         self.lbl_total.grid(row=8, column=1, sticky="e", pady=10)
         self.ent_nights.bind("<KeyRelease>", lambda e: self.update_total())
         self.combo_cat.bind("<<ComboboxSelected>>", lambda e: self.update_total())
-        tk.Button(form_frame, text="ЗАРЕГИСТРИРОВАТЬ И ОПЛАТИТЬ", command=self.register_guest, bg="#27ae60", fg="white", font=("Arial", 12, "bold")).grid(row=9, column=1, sticky="e", pady=20)
+        tk.Button(form_frame, text="REGISTER AND PAY", command=self.register_guest, bg="#27ae60", fg="white", font=("Arial", 12, "bold")).grid(row=9, column=1, sticky="e", pady=20)
         self.update_total()
 
     def load_services_checkboxes(self):
@@ -325,7 +322,7 @@ class App(tk.Tk):
         conn.close()
         for idx, svc in enumerate(services):
             var = tk.IntVar()
-            chk = tk.Checkbutton(self.services_frame, text=f"{svc['service_name']} ({svc['price']} руб./ночь)", variable=var, bg="white", command=self.update_total)
+            chk = tk.Checkbutton(self.services_frame, text=f"{svc['service_name']} ({svc['price']} RUB/night)", variable=var, bg="white", command=self.update_total)
             chk.grid(row=idx//2, column=idx%2, sticky="w")
             self.service_vars.append((var, svc['service_name'], svc['price']))
 
@@ -339,7 +336,7 @@ class App(tk.Tk):
         base_price = self.current_categories[cat_idx]['base_price'] if cat_idx >= 0 else 0
         room_total = base_price * nights
         services_total = sum(price * nights for var, name, price in self.service_vars if var.get() == 1)
-        self.lbl_total.config(text=f"Итого: {room_total + services_total:.2f} руб.")
+        self.lbl_total.config(text=f"Total: {room_total + services_total:.2f} RUB")
 
     def register_guest(self):
         lastname = self.ent_lastname.get()
@@ -347,30 +344,30 @@ class App(tk.Tk):
         phone = self.ent_phone.get()
         email = self.ent_email.get()
         if not lastname or not firstname:
-            messagebox.showerror("Ошибка", "Введите имя и фамилию")
+            messagebox.showerror("Error", "Please enter first and last name")
             return
         try:
             nights = int(self.ent_nights.get())
             if nights <= 0:
-                messagebox.showerror("Ошибка", "Количество ночей должно быть больше нуля")
+                messagebox.showerror("Error", "Number of nights must be greater than zero")
                 return
         except ValueError:
-            messagebox.showerror("Ошибка", "Неверное количество ночей")
+            messagebox.showerror("Error", "Invalid number of nights")
             return
         cat_idx = self.combo_cat.current()
         if cat_idx < 0:
-            messagebox.showerror("Ошибка", "Выберите категорию номера")
+            messagebox.showerror("Error", "Please select a room category")
             return
         selected_cat = self.current_categories[cat_idx]
         cat_id = selected_cat['category_id']
         base_price = selected_cat['base_price']
-        
+
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT room_id FROM rooms WHERE category_id=? AND status='свободен' LIMIT 1", (cat_id,))
+        cur.execute("SELECT room_id FROM rooms WHERE category_id=? AND status='available' LIMIT 1", (cat_id,))
         room = cur.fetchone()
         if not room:
-            messagebox.showwarning("Внимание", "Нет свободных номеров в этой категории!")
+            messagebox.showwarning("Warning", "No available rooms in this category!")
             conn.close()
             return
         room_id = room['room_id']
@@ -382,7 +379,7 @@ class App(tk.Tk):
         try:
             check_out_dt = datetime.strptime(check_in, "%Y-%m-%d") + timedelta(days=nights)
         except ValueError:
-            messagebox.showerror("Ошибка", "Неверный формат даты")
+            messagebox.showerror("Error", "Invalid date format")
             conn.close()
             return
         check_out = check_out_dt.strftime("%Y-%m-%d")
@@ -391,12 +388,12 @@ class App(tk.Tk):
         total_price = (base_price * nights) + services_total
 
         cur.execute("INSERT INTO stays (guest_id, room_id, check_in_date, check_out_date, total_price, payment_status) VALUES (?, ?, ?, ?, ?, ?)", 
-                    (guest_id, room_id, check_in, check_out, total_price, 'оплачено'))
-        
-        cur.execute("UPDATE rooms SET status='занят' WHERE room_id=?", (room_id,))
+                    (guest_id, room_id, check_in, check_out, total_price, 'paid'))
+
+        cur.execute("UPDATE rooms SET status='occupied' WHERE room_id=?", (room_id,))
         conn.commit()
         conn.close()
-        messagebox.showinfo("Успех", f"Гость зарегистрирован.\nНомер: {room_id}\nОплачено: {total_price} руб.")
+        messagebox.showinfo("Success", f"Guest registered.\nRoom: {room_id}\nPaid: {total_price} RUB")
         self.show_dashboard()
 
     def refresh_categories(self):
@@ -409,66 +406,50 @@ class App(tk.Tk):
         self.combo_cat['values'] = names
         if names: self.combo_cat.current(0)
 
-    def edit_category_name(self):
-        idx = self.combo_cat.current()
-        if idx < 0: return
-        old_name = self.current_categories[idx]['category_name']
-        cat_id = self.current_categories[idx]['category_id']
-        new_name = simpledialog.askstring("Редактирование категории", f"Введите новое название для '{old_name}':", initialvalue=old_name)
-        if new_name and new_name != old_name:
-            conn = get_connection()
-            cur = conn.cursor()
-            cur.execute("UPDATE room_categories SET category_name = ? WHERE category_id = ?", (new_name, cat_id))
-            conn.commit()
-            conn.close()
-            self.refresh_categories()
-            self.combo_cat.current(idx)
-            self.update_total()
-
     def show_cleaning(self):
         self.clear_content()
-        tk.Label(self.content_frame, text="Задачи уборки", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
+        tk.Label(self.content_frame, text="Cleaning Tasks", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
         form_frame = tk.Frame(self.content_frame, bg="white")
         form_frame.pack(fill="x", padx=20, pady=10)
-        tk.Label(form_frame, text="Номер:", bg="white").grid(row=0, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Room:", bg="white").grid(row=0, column=0, sticky="w", pady=5)
         self.combo_room_clean = ttk.Combobox(form_frame, width=20, state="readonly")
         self.combo_room_clean.grid(row=0, column=1, pady=5)
-        tk.Label(form_frame, text="Сотрудник:", bg="white").grid(row=1, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Staff:", bg="white").grid(row=1, column=0, sticky="w", pady=5)
         self.combo_staff_clean = ttk.Combobox(form_frame, width=20, state="readonly")
         self.combo_staff_clean.grid(row=1, column=1, pady=5)
-        tk.Button(form_frame, text="Назначить уборку", command=lambda: self.assign_task("уборка"), bg="#2980b9", fg="white").grid(row=2, column=1, sticky="e", pady=10)
-        self.load_dropdowns("уборка")
-        self.render_tasks_tree("уборка")
+        tk.Button(form_frame, text="Assign Cleaning", command=lambda: self.assign_task("cleaning"), bg="#2980b9", fg="white").grid(row=2, column=1, sticky="e", pady=10)
+        self.load_dropdowns("cleaning")
+        self.render_tasks_tree("cleaning")
 
     def show_maintenance(self):
         self.clear_content()
-        tk.Label(self.content_frame, text="Задачи ремонта", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
+        tk.Label(self.content_frame, text="Maintenance Tasks", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
         form_frame = tk.Frame(self.content_frame, bg="white")
         form_frame.pack(fill="x", padx=20, pady=10)
-        tk.Label(form_frame, text="Номер:", bg="white").grid(row=0, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Room:", bg="white").grid(row=0, column=0, sticky="w", pady=5)
         self.combo_room_maint = ttk.Combobox(form_frame, width=20, state="readonly")
         self.combo_room_maint.grid(row=0, column=1, pady=5)
-        tk.Label(form_frame, text="Сотрудник:", bg="white").grid(row=1, column=0, sticky="w", pady=5)
+        tk.Label(form_frame, text="Staff:", bg="white").grid(row=1, column=0, sticky="w", pady=5)
         self.combo_staff_maint = ttk.Combobox(form_frame, width=20, state="readonly")
         self.combo_staff_maint.grid(row=1, column=1, pady=5)
-        tk.Button(form_frame, text="Назначить ремонт", command=lambda: self.assign_task("ремонт"), bg="#2980b9", fg="white").grid(row=2, column=1, sticky="e", pady=10)
-        self.load_dropdowns("ремонт")
-        self.render_tasks_tree("ремонт")
+        tk.Button(form_frame, text="Assign Maintenance", command=lambda: self.assign_task("maintenance"), bg="#2980b9", fg="white").grid(row=2, column=1, sticky="e", pady=10)
+        self.load_dropdowns("maintenance")
+        self.render_tasks_tree("maintenance")
 
     def load_dropdowns(self, task_type):
         conn = get_connection()
         cur = conn.cursor()
-        combo_room = self.combo_room_clean if task_type == "уборка" else self.combo_room_maint
-        combo_staff = self.combo_staff_clean if task_type == "уборка" else self.combo_staff_maint
-        if task_type == "уборка":
-            cur.execute("SELECT room_id, room_number FROM rooms WHERE status IN ('свободен', 'занят', 'уборка') ORDER BY room_number")
+        combo_room = self.combo_room_clean if task_type == "cleaning" else self.combo_room_maint
+        combo_staff = self.combo_staff_clean if task_type == "cleaning" else self.combo_staff_maint
+        if task_type == "cleaning":
+            cur.execute("SELECT room_id, room_number FROM rooms WHERE status IN ('available', 'occupied', 'cleaning') ORDER BY room_number")
         else:
-            cur.execute("SELECT room_id, room_number FROM rooms WHERE status IN ('свободен', 'уборка', 'ремонт') ORDER BY room_number")
+            cur.execute("SELECT room_id, room_number FROM rooms WHERE status IN ('available', 'cleaning', 'maintenance') ORDER BY room_number")
         rooms = cur.fetchall()
         setattr(self, f"room_{task_type}_data", rooms)
         combo_room['values'] = [f"{r['room_number']}" for r in rooms]
         if rooms: combo_room.current(0)
-        position = 'уборщик' if task_type == "уборка" else 'ремонтник'
+        position = 'cleaner' if task_type == "cleaning" else 'maintenance_worker'
         cur.execute("SELECT staff_id, first_name, last_name FROM staff WHERE position=?", (position,))
         staff = cur.fetchall()
         setattr(self, f"staff_{task_type}_data", staff)
@@ -477,29 +458,29 @@ class App(tk.Tk):
         conn.close()
 
     def assign_task(self, task_type):
-        combo_room = self.combo_room_clean if task_type == "уборка" else self.combo_room_maint
-        combo_staff = self.combo_staff_clean if task_type == "уборка" else self.combo_staff_maint
+        combo_room = self.combo_room_clean if task_type == "cleaning" else self.combo_room_maint
+        combo_staff = self.combo_staff_clean if task_type == "cleaning" else self.combo_staff_maint
         r_idx = combo_room.current()
         s_idx = combo_staff.current()
         if r_idx < 0 or s_idx < 0:
-            messagebox.showwarning("Внимание", "Выберите номер и сотрудника")
+            messagebox.showwarning("Warning", "Please select a room and staff member")
             return
         room_id = getattr(self, f"room_{task_type}_data")[r_idx]['room_id']
         staff_id = getattr(self, f"staff_{task_type}_data")[s_idx]['staff_id']
-        
+
         conn = get_connection()
         cur = conn.cursor()
-        
+
         cur.execute("SELECT status FROM rooms WHERE room_id=?", (room_id,))
         room_status = cur.fetchone()['status']
-        if room_status == 'занят':
-            messagebox.showwarning("Внимание", "Нельзя назначить задачу занятому номеру. Сначала выселите гостя.")
+        if room_status == 'occupied':
+            messagebox.showwarning("Warning", "Cannot assign task to an occupied room. Check out the guest first.")
             conn.close()
             return
-        
-        cur.execute("SELECT task_id FROM room_tasks WHERE room_id=? AND task_type=? AND status='ожидает' LIMIT 1", (room_id, task_type))
+
+        cur.execute("SELECT task_id FROM room_tasks WHERE room_id=? AND task_type=? AND status='pending' LIMIT 1", (room_id, task_type))
         if cur.fetchone():
-            messagebox.showwarning("Внимание", f"Для этого номера уже есть активная задача: {task_type}.")
+            messagebox.showwarning("Warning", f"This room already has an active task: {task_type}.")
             conn.close()
             return
 
@@ -507,13 +488,13 @@ class App(tk.Tk):
         cur.execute("UPDATE rooms SET status=? WHERE room_id=?", (task_type, room_id))
         conn.commit()
         conn.close()
-        if task_type == "уборка": self.show_cleaning()
+        if task_type == "cleaning": self.show_cleaning()
         else: self.show_maintenance()
 
     def render_tasks_tree(self, task_type):
         tree_frame = tk.Frame(self.content_frame)
         tree_frame.pack(fill="both", expand=True, padx=20, pady=10)
-        columns = ("ID", "Номер", "Сотрудник", "Дата", "Статус")
+        columns = ("ID", "Room", "Staff", "Date", "Status")
         tree = ttk.Treeview(tree_frame, columns=columns, show="headings")
         for col in columns:
             tree.heading(col, text=col)
@@ -529,14 +510,14 @@ class App(tk.Tk):
             FROM room_tasks ct
             JOIN rooms r ON ct.room_id = r.room_id
             JOIN staff s ON ct.staff_id = s.staff_id
-            WHERE ct.task_type=? AND ct.status != 'завершено'
+            WHERE ct.task_type=? AND ct.status != 'completed'
             ORDER BY ct.task_date DESC
         """, (task_type,))
         rows = cur.fetchall()
         conn.close()
         for row in rows:
             tree.insert("", tk.END, values=(row['task_id'], row['room_number'], row['staff_name'], row['task_date'], row['status']))
-        btn_complete = tk.Button(self.content_frame, text="Завершить выбранную", command=lambda: self.complete_task(task_type, tree), bg="#27ae60", fg="white")
+        btn_complete = tk.Button(self.content_frame, text="Complete Selected", command=lambda: self.complete_task(task_type, tree), bg="#27ae60", fg="white")
         btn_complete.pack(pady=10)
 
     def complete_task(self, task_type, tree):
@@ -548,31 +529,31 @@ class App(tk.Tk):
         cur.execute("SELECT room_id FROM room_tasks WHERE task_id=?", (task_id,))
         res = cur.fetchone()
         if res:
-            cur.execute("UPDATE room_tasks SET status='завершено' WHERE task_id=?", (task_id,))
+            cur.execute("UPDATE room_tasks SET status='completed' WHERE task_id=?", (task_id,))
             cur.execute("SELECT status FROM rooms WHERE room_id=?", (res['room_id'],))
-            if cur.fetchone()['status'] != 'занят':
-                cur.execute("UPDATE rooms SET status='свободен' WHERE room_id=?", (res['room_id'],))
+            if cur.fetchone()['status'] != 'occupied':
+                cur.execute("UPDATE rooms SET status='available' WHERE room_id=?", (res['room_id'],))
             conn.commit()
         conn.close()
-        if task_type == "уборка": self.show_cleaning()
+        if task_type == "cleaning": self.show_cleaning()
         else: self.show_maintenance()
 
     def show_stays(self):
         self.clear_content()
-        tk.Label(self.content_frame, text="Проживания и выселение", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
+        tk.Label(self.content_frame, text="Stays and Check-out", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
         tree_frame = tk.Frame(self.content_frame)
         tree_frame.pack(fill="both", expand=True, padx=20, pady=10)
-        columns = ("ID", "Гость", "Номер", "Заезд", "Выезд", "Сумма", "Оплата")
+        columns = ("ID", "Guest", "Room", "Check-in", "Check-out", "Amount", "Payment")
         self.stays_tree = ttk.Treeview(tree_frame, columns=columns, show="headings")
         for col in columns:
             self.stays_tree.heading(col, text=col)
-            if col == "Гость": self.stays_tree.column(col, width=180)
+            if col == "Guest": self.stays_tree.column(col, width=180)
             else: self.stays_tree.column(col, width=120)
         scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.stays_tree.yview)
         self.stays_tree.configure(yscroll=scrollbar.set)
         self.stays_tree.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
-        btn_checkout = tk.Button(self.content_frame, text="Выселить гостя", command=self.checkout_guest, bg="#e74c3c", fg="white", font=("Arial", 10, "bold"))
+        btn_checkout = tk.Button(self.content_frame, text="Check Out Guest", command=self.checkout_guest, bg="#e74c3c", fg="white", font=("Arial", 10, "bold"))
         btn_checkout.pack(pady=10)
         self.load_stays_data()
 
@@ -585,17 +566,17 @@ class App(tk.Tk):
         rows = cur.fetchall()
         conn.close()
         for row in rows:
-            self.stays_tree.insert("", tk.END, values=(row['stay_id'], row['guest_name'], row['room_number'], row['check_in_date'], row['check_out_date'], f"{row['total_price']} руб.", row['payment_status']))
+            self.stays_tree.insert("", tk.END, values=(row['stay_id'], row['guest_name'], row['room_number'], row['check_in_date'], row['check_out_date'], f"{row['total_price']} RUB", row['payment_status']))
 
     def checkout_guest(self):
         selected = self.stays_tree.selection()
         if not selected:
-            messagebox.showwarning("Внимание", "Выберите проживание для выселения")
+            messagebox.showwarning("Warning", "Please select a stay to check out")
             return
         item_values = self.stays_tree.item(selected[0], 'values')
         stay_id = int(item_values[0])
         room_number = item_values[2]
-        resp = messagebox.askyesno("Подтверждение выселения", f"Выселить гостя из номера {room_number}?\nЗапись о проживании будет удалена. Выручка сохранится в истории гостя.")
+        resp = messagebox.askyesno("Check-out Confirmation", f"Check out guest from room {room_number}?\nThe stay record will be deleted. Revenue will be saved in guest history.")
         if resp:
             conn = get_connection()
             cur = conn.cursor()
@@ -603,24 +584,24 @@ class App(tk.Tk):
             res = cur.fetchone()
             if res:
                 cur.execute("UPDATE guests SET total_spent = COALESCE(total_spent, 0) + ? WHERE guest_id=?", (res['total_price'], res['guest_id']))
-                cur.execute("UPDATE rooms SET status='уборка' WHERE room_id=? AND status='занят'", (res['room_id'],))
+                cur.execute("UPDATE rooms SET status='cleaning' WHERE room_id=? AND status='occupied'", (res['room_id'],))
                 cur.execute("DELETE FROM stays WHERE stay_id=?", (stay_id,))
             conn.commit()
             conn.close()
-            messagebox.showinfo("Успех", f"Гость выселен. Выручка {item_values[5]} сохранена в профиле гостя.")
+            messagebox.showinfo("Success", f"Guest checked out. Revenue {item_values[5]} saved in guest profile.")
             self.load_stays_data()
 
     def show_guests(self):
         self.clear_content()
-        tk.Label(self.content_frame, text="База гостей", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
+        tk.Label(self.content_frame, text="Guest Database", font=("Arial", 18, "bold"), bg="white").pack(pady=20, anchor="w", padx=20)
         search_frame = tk.Frame(self.content_frame, bg="white")
         search_frame.pack(fill="x", padx=20)
-        tk.Label(search_frame, text="Поиск по фамилии:", bg="white").pack(side="left")
+        tk.Label(search_frame, text="Search by last name:", bg="white").pack(side="left")
         ent_search = tk.Entry(search_frame, width=30)
         ent_search.pack(side="left", padx=5)
         tree_frame = tk.Frame(self.content_frame)
         tree_frame.pack(fill="both", expand=True, padx=20, pady=10)
-        columns = ("ID", "Фамилия", "Имя", "Телефон", "Email", "Потрачено")
+        columns = ("ID", "Last Name", "First Name", "Phone", "Email", "Total Spent")
         tree = ttk.Treeview(tree_frame, columns=columns, show="headings")
         for col in columns:
             tree.heading(col, text=col)
@@ -639,7 +620,7 @@ class App(tk.Tk):
             rows = cur.fetchall()
             conn.close()
             for row in rows:
-                tree.insert("", tk.END, values=(row['guest_id'], row['last_name'], row['first_name'], row['phone'], row['email'], f"{row['total_spent']:.2f} руб."))
+                tree.insert("", tk.END, values=(row['guest_id'], row['last_name'], row['first_name'], row['phone'], row['email'], f"{row['total_spent']:.2f} RUB"))
         ent_search.bind("<KeyRelease>", search_guests)
         search_guests()
 
