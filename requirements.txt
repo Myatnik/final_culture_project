@@ -1,0 +1,9 @@
+# Requirements
+#
+# This project uses only Python standard library:
+# - tkinter (GUI)
+# - sqlite3 (database)
+# - datetime (work with dates, time)
+#
+# System dependency: tkinter must be installed separately.
+# See README.md for installation instructions.
